@@ -1,0 +1,26 @@
+import { supabase } from "../lib/supabase.ts";
+
+//Get user data from database
+export async function GetUserData(userID){
+    try{
+        //Fetch data by ID
+        //*single -> Array to object
+        const {data, error} = await supabase.from("users")
+        .select().eq("id",userID).single(); 
+
+        if (error){
+            return {success: false, msg: error?.message};
+        }
+        else{
+            return {success: true, data};
+        }
+    }
+    catch(error){
+        console.log(error);
+        return {success: false, msg: error.message}
+    }
+}
+
+export async function GetUserGroup(userID){
+
+}
