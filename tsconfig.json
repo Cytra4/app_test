@@ -13,10 +13,7 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-<<<<<<< HEAD
     // "components/*.tsx",
     // "components/*.jsx"
-=======
->>>>>>> 9442273604a41f9da59cade6c50793edf2ccb125
   ]
 }
