@@ -5,7 +5,7 @@ export async function GetUserData(userID){
     try{
         //Fetch data by ID
         //*single -> Array to object
-        const {data, error} = await supabase.from("users")
+        const {data, error} = await supabase.from("profiles")
         .select().eq("id",userID).single(); 
 
         if (error){
