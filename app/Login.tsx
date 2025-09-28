@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import CustomInput from '@/components/CustomInput';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { supabase, SupabaseHooks } from '@/lib/supabase';
+import { SupabaseHooks } from '@/lib/supabase';
 import { hp, wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -25,7 +25,7 @@ export default function Login() {
 			email: email.trim(),
 			password: password.trim(),
 		})
-		setError(signInMutation.isError ? "登入失敗，請確認信箱與密碼是否正確" : null);
+		setError(!signInMutation.isPending || signInMutation.isSuccess ? null : "登入失敗，請確認信箱與密碼是否正確");
 	}
 
 	return (
