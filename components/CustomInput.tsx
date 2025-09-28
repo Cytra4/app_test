@@ -29,37 +29,39 @@ export default function CustomInput({
     iconColor = "black",
     iconSize = 24,
     secureText = false
-}:InputProps){
-  return (
-    <View style={[styles.container,boxStyle]}>
-        {/* Right now the icon can only use Feather cause I suck at coding :/ */}
-        <Feather style={[styles.icon,iconStyle]} name={iconName} size={iconSize} color={iconColor} />
-        <TextInput
-            placeholder={placeholder}
-            style={[styles.text,textStyle]}
-            onChangeText={onChange}
-            keyboardType={keyboardType}
-            secureTextEntry={secureText}
-        />
-    </View>
-  )
+}: InputProps) {
+    return (
+        <View style={[styles.container, boxStyle]}>
+            {/* Right now the icon can only use Feather cause I suck at coding :/ */}
+            <Feather style={[styles.icon, iconStyle]} name={iconName} size={iconSize} color={iconColor} />
+            <TextInput
+                placeholder={placeholder}
+                style={[styles.text, textStyle]}
+                onChangeText={onChange}
+                keyboardType={keyboardType}
+                secureTextEntry={secureText}
+            />
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
-    container:{
+    container: {
         flexDirection: "row",
+        alignItems: "center",
         borderWidth: 2,
         borderRadius: 15,
         height: hp(6.5),
-        width: wp(80)
+        width: wp(80),
+        paddingRight: 12
     },
-    icon:{
-        paddingVertical: 15,
+    icon: {
         paddingLeft: 12,
-        paddingRight: 8
+        paddingRight: 8,
     },
-    text:{
+    text: {
+        flex: 1,
         fontSize: 20,
-        fontWeight: "bold"
+        fontWeight: "bold",
     }
 })

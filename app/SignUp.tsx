@@ -72,7 +72,7 @@ export default function SignUp() {
                     <CustomInput
                         placeholder="使用者名稱"
                         onChange={setUsername}
-                        boxStyle={{ marginBottom: 25 }}
+                        boxStyle={{marginBottom: 25 }}
                         iconName='user'
                     />
 
