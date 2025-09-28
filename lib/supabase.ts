@@ -3,8 +3,8 @@ import { createClient, processLock } from "@supabase/supabase-js";
 import { AppState, Platform } from "react-native";
 import "react-native-url-polyfill/auto";
 
-import { queryClient } from "./client";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "./client";
 
 const supabaseUrl = "https://eorzockecnnafbeghvnq.supabase.co";
 const supabaseAnonKey =
@@ -124,7 +124,7 @@ function useFetch<T>(
 	options: FetchOptions = { select: '*' }
 ) {
 	return useQuery<T[], Error>({
-		queryKey: ['useFetch', table, options],
+		queryKey: ['fetch', table, options],
 		queryFn: async () => {
 			let query = supabase.from(table).select(options.select);
 
@@ -156,7 +156,9 @@ function useFetch<T>(
 
 			return (data ?? []) as T[];
 		},
-		staleTime: 1000 * 60, // fetch per 1 min
+		staleTime: 1000 * 60 * 5, // fetch per 5 min
+		refetchOnWindowFocus: false, // 窗口 / app 返回前台時自動刷新
+		refetchOnMount: false,       // component mount 時自動刷新
 	});
 }
 
@@ -165,7 +167,7 @@ function useFetchBuilder<T>(
 	deps: any[] = [] // 用來觸發 refetch 的依賴值
 ) {
 	return useQuery<T[], Error>({
-		queryKey: ["useFetch", ...deps], // 把依賴值加入 queryKey
+		queryKey: ["fetch", ...deps], // 把依賴值加入 queryKey
 		queryFn: async () => {
 			const query = queryBuilder();
 
@@ -189,7 +191,7 @@ function useInsert<T>() {
 			return (data ?? []) as T[];
 		},
 		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
+			queryClient.invalidateQueries({ queryKey: ['fetch', table] });
 		},
 		onError: (error: any) => {
 			console.error("Insert failed:", error.message);
@@ -210,7 +212,7 @@ function useDelete<T>() {
 			return (data ?? []) as T[];
 		},
 		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
+			queryClient.invalidateQueries({ queryKey: ['fetch', table] });
 		},
 		onError: (error: any) => {
 			console.error("Delete failed:", error.message);
@@ -232,7 +234,7 @@ function useUpdate<T>() {
 			return (data ?? []) as T[];
 		},
 		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
+			queryClient.invalidateQueries({ queryKey: ['fetch', table] });
 		},
 		onError: (error: any) => {
 			console.error("Update failed:", error.message);

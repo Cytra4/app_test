@@ -14,9 +14,11 @@ export default function Index() {
 	const { data: profile } = SupabaseHooks.useProfile();
 
 	const insertMutation = SupabaseHooks.useInsert();
-	const { data: groups, isLoading } = SupabaseHooks.useFetch<any>('groups', {
+	const { data: groups, isLoading, isSuccess } = SupabaseHooks.useFetch<any>('groups', {
 		order: [{ column: 'created_at', ascending: false }]
 	});
+	if (isSuccess)
+		console.log(groups);
 
 	return (
 		<ScreenWrapper bg="white">
