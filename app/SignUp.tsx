@@ -14,11 +14,11 @@ export default function SignUp() {
 	const [error, setError] = useState<string | null>("");
 	const router = useRouter();
 
-	const profilesForm = useForm({ username: '', email: '@gmail.com', password: '123456' });
-	const supabaseSignUp = SupabaseHooks.useSignUp();
+	const signUpForm = useForm({ username: '', email: '@gmail.com', password: '123456' });
+	const signUpMutation = SupabaseHooks.useSignUp();
 
 	async function SignUp() {
-		const { username, email, password } = profilesForm.values;
+		const { username, email, password } = signUpForm.values;
 
 		if (!username) {
 			setError("請輸入使用者名稱");
@@ -33,13 +33,13 @@ export default function SignUp() {
 			return;
 		}
 
-		supabaseSignUp.mutate({
+		signUpMutation.mutate({
 			email: email.trim(),
 			password: password.trim(),
 			username: username.trim(),
 		});
 
-		if (supabaseSignUp.isSuccess) {
+		if (signUpMutation.isSuccess) {
 			console.log("User create success.")
 			setError(null);
 		}
@@ -67,26 +67,26 @@ export default function SignUp() {
 					</View>
 
 					<CustomInput
-						value={profilesForm.values.username}
+						value={signUpForm.values.username}
 						placeholder="使用者名稱"
-						onChange={(t) => profilesForm.onChange('username', t)}
+						onChange={(t) => signUpForm.onChange('username', t)}
 						boxStyle={{ marginBottom: 25 }}
 						iconName='user'
 					/>
 
 					<CustomInput
-						value={profilesForm.values.email}
+						value={signUpForm.values.email}
 						placeholder="信箱"
-						onChange={(t) => profilesForm.onChange('email', t)}
+						onChange={(t) => signUpForm.onChange('email', t)}
 						boxStyle={{ marginBottom: 25 }}
 						iconName='mail'
 						keyboardType='email-address'
 					/>
 
 					<CustomInput
-						value={profilesForm.values.password}
+						value={signUpForm.values.password}
 						placeholder="密碼"
-						onChange={(t) => profilesForm.onChange('password', t)}
+						onChange={(t) => signUpForm.onChange('password', t)}
 						boxStyle={{}}
 						iconName='lock'
 						secureText={true}
@@ -97,7 +97,7 @@ export default function SignUp() {
 					<Button
 						title="申請"
 						buttonStyle={styles.button}
-						loading={supabaseSignUp.isPending}
+						loading={signUpMutation.isPending}
 						onPress={SignUp}
 					/>
 
