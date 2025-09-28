@@ -5,8 +5,8 @@ import { User } from "@supabase/supabase-js";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "../scripts/AuthContext";
 import { GetUserData } from "../scripts/UserService.js";
-import Home from "./Home";
-import Login from "./Login";
+import index from "./index";
+import Login from "./Login"
 import SignUp from "./SignUp";
 
 const Stack = createNativeStackNavigator();
@@ -47,11 +47,11 @@ function RootLayout() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* Take user to home page when login success */}
+      {/* Take user to index page when login success */}
       {user ?
         <Stack.Screen
-          name="Home"
-          component={Home}
+          name="index"
+          component={index}
           options={{
             headerShown: true,
             headerTitleAlign: "center",

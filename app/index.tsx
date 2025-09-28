@@ -5,7 +5,7 @@ import { wp } from '@/scripts/constants';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function Home() {
+export default function index() {
     const { user, setAuth } = useAuth();
 
     async function SignOut() {
