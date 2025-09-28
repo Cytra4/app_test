@@ -1,5 +1,5 @@
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { supabase } from '@/lib/supabase';
+import { SupabaseHooks } from '@/lib/supabase';
 import { useAuth } from '@/scripts/AuthContext';
 import { wp } from '@/scripts/constants';
 import React from 'react';
@@ -8,19 +8,13 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function Index() {
 	const { user, setAuth } = useAuth();
 
-	async function SignOut() {
-		const { error } = await supabase.auth.signOut();
-		if (error) console.log("Sign out failed.")
-		else {
-			console.log("Sign out success.")
-		};
-	}
+	const signOutMutation = SupabaseHooks.useSignOut();
 
 	return (
 		<ScreenWrapper bg="white">
 			<View style={styles.container}>
 				<Text
-					onPress={SignOut}
+					onPress={() => signOutMutation.mutate()}
 					style={{ fontSize: 20 }}
 				>
 					登出

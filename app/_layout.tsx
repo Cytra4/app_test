@@ -50,6 +50,8 @@ function RootLayout() {
 		}
 	}
 
+	
+
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			{/* Take user to index page when login success */}

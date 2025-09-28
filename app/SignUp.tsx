@@ -1,23 +1,21 @@
 import { Button } from '@/components/Button';
 import CustomInput from '@/components/CustomInput';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { SupabaseHooks, useForm } from '@/lib/supabase';
+import { useForm } from '@/lib/client';
+import { SupabaseHooks } from '@/lib/supabase';
 import { hp, wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 
 export default function SignUp() {
-	// const [username, setUsername] = useState<string>("");
-	// const [email, setEmail] = useState<string>("");
-	// const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>("");
 	const router = useRouter();
 
-	const signUpForm = useForm({ username: '', email: '@gmail.com', password: '123456' });
+	const signUpForm = useForm({ username: '', email: '', password: '' });
 	const signUpMutation = SupabaseHooks.useSignUp();
 
-	async function SignUp() {
+	function SignUp() {
 		const { username, email, password } = signUpForm.values;
 
 		if (!username) {
@@ -59,15 +57,14 @@ export default function SignUp() {
 					/>
 
 					<View style={{ marginBottom: hp(5) }}>
-						<Text style={styles.title}>*超酷的App標題*</Text>
+						<Text style={styles.title}>*那一天，人類回想起了被帳號支配的恐懼*</Text>
 					</View>
 
 					<View style={{ marginBottom: hp(3) }}>
-						<Text style={styles.welcome}>馬上加入</Text>
+						<Text style={styles.welcome}>馬上加入調查兵團</Text>
 					</View>
 
 					<CustomInput
-						value={signUpForm.values.username}
 						placeholder="使用者名稱"
 						onChange={(t) => signUpForm.onChange('username', t)}
 						boxStyle={{ marginBottom: 25 }}
@@ -75,7 +72,6 @@ export default function SignUp() {
 					/>
 
 					<CustomInput
-						value={signUpForm.values.email}
 						placeholder="信箱"
 						onChange={(t) => signUpForm.onChange('email', t)}
 						boxStyle={{ marginBottom: 25 }}
@@ -84,7 +80,6 @@ export default function SignUp() {
 					/>
 
 					<CustomInput
-						value={signUpForm.values.password}
 						placeholder="密碼"
 						onChange={(t) => signUpForm.onChange('password', t)}
 						boxStyle={{}}

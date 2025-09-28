@@ -5,7 +5,6 @@ import "react-native-url-polyfill/auto";
 
 import { queryClient } from "./client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 
 const supabaseUrl = "https://eorzockecnnafbeghvnq.supabase.co";
 const supabaseAnonKey =
@@ -36,99 +35,15 @@ if (Platform.OS !== "web") {
 	});
 }
 
-export function useForm<T>(initial: T) {
-	const [values, setValues] = useState(initial);
-
-	const onChange = (key: keyof T, value: any) => {
-		setValues((prev) => ({ ...prev, [key]: value }));
-	};
-
-	const reset = () => setValues(initial);
-
-	return { values, onChange, setValues, reset };
-}
-
 export const SupabaseHooks = {
 	useSignUp,
+	useSignOut,
 	useFetch,
+	useFetchBuilder,
 	useInsert,
 	useDelete,
+	useUpdate,
 };
-
-// export function useFetchTest<T>(
-//     table: string,
-//     filter?: Record<string, string | number>,
-//     limit?: number,
-// ) {
-//     return useQuery<T[], Error>({
-//         queryKey: ['useFetchTest'],
-//         queryFn: async () => {
-//             const query = supabase.from(table).select('*');
-
-//             query.limit(-1);
-//         }
-//     });
-// }
-
-export function useFetch<T>(
-	queryBuilder: () => any, // Supabase 查詢函數
-	deps: any[] = [] // 用來觸發 refetch 的依賴值
-) {
-	return useQuery<T[], Error>({
-		queryKey: ["useFetch", ...deps], // 把依賴值加入 queryKey
-		queryFn: async () => {
-			const query = queryBuilder();
-			const { data, error } = await query;
-
-			if (error) throw error;
-
-			return (data ?? []) as T[];
-		},
-	});
-}
-
-function useInsert() {
-	return useMutation({
-		mutationFn: async ({ table, row }: {
-			table: string;
-			row: Record<string, any>;
-		}) => {
-			const { data, error } = await supabase.from(table).insert(row).select();
-
-			if (error) throw error;
-			console.log("Inserted data:", data);
-
-			return data ?? [];
-		},
-		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
-		},
-	});
-}
-
-function useDelete<T>() {
-	return useMutation({
-		mutationFn: async ({ table, column, value }: {
-			table: string;
-			column: string;
-			value: string | number;
-		}) => {
-			const { data, error } = await supabase
-				.from(table)
-				.delete()
-				.eq(column, value)
-				.select();
-
-			if (error) throw error;
-			console.log("Deleted data:", data);
-
-			return (data ?? []) as T[];
-		},
-		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
-		},
-	});
-}
 
 function useSignUp() {
 	return useMutation({
@@ -144,24 +59,158 @@ function useSignUp() {
 					data: { username: username },
 				},
 			});
-
 			if (error) throw error;
-			console.log("註冊成功:", data);
 
 			return data;
+		},
+		onError: (error: any) => {
+			console.error("Sign up failed:", error.message);
 		},
 	});
 }
 
-// async function signIn(email: string, password: string) {
-//     const { data, error } = await supabase.auth.signInWithPassword({
-//         email,
-//         password,
-//     })
+function useSignOut() {
+	return useMutation({
+		mutationFn: async () => {
+			const { error } = await supabase.auth.signOut();
+			if (error) throw error;
 
-//     if (error) {
-//         console.error('登入失敗:', error.message)
-//     } else {
-//         console.log('登入成功:')
-//     }
-// }
+			return true;
+		},
+		onSuccess: () => {
+			console.log("Sign out success");
+			queryClient.clear(); // clear react-query cache
+		},
+		onError: (error: any) => {
+			console.error("Sign out failed:", error.message);
+		},
+	});
+}
+
+type FetchOptions = {
+	select?: string;
+	limit?: number;
+	filter?: Record<string, string | number>;
+	order?: { column: string; ascending?: boolean }[];
+	search?: { column: string; value: string | number };
+};
+function useFetch<T>(
+	table: string,
+	options: FetchOptions = { select: '*' }
+) {
+	return useQuery<T[], Error>({
+		queryKey: ['useFetch', table, options],
+		queryFn: async () => {
+			let query = supabase.from(table).select(options.select);
+
+			if (options.filter) {
+				for (const [key, value] of Object.entries(options.filter)) {
+					query = query.eq(key, value);
+				}
+			}
+
+			if (options.search) {
+				const { column, value } = options.search;
+				if (typeof value === 'number') {
+					query = query.eq(column, value);
+				} else {
+					query = query.ilike(column, `%${value}%`);
+				}
+			}
+
+			if (options.limit) query = query.limit(options.limit);
+
+			if (options.order) {
+				options.order.forEach(o => {
+					query = query.order(o.column, { ascending: o.ascending ?? true });
+				});
+			}
+
+			const { data, error } = await query;
+			if (error) throw error;
+
+			return (data ?? []) as T[];
+		},
+		staleTime: 1000 * 60, // fetch per 1 min
+	});
+}
+
+function useFetchBuilder<T>(
+	queryBuilder: () => any, // Supabase 查詢函數
+	deps: any[] = [] // 用來觸發 refetch 的依賴值
+) {
+	return useQuery<T[], Error>({
+		queryKey: ["useFetch", ...deps], // 把依賴值加入 queryKey
+		queryFn: async () => {
+			const query = queryBuilder();
+
+			const { data, error } = await query;
+			if (error) throw error;
+
+			return (data ?? []) as T[];
+		},
+	});
+}
+
+function useInsert<T>() {
+	return useMutation({
+		mutationFn: async ({ table, row }: {
+			table: string;
+			row: Record<string, any>;
+		}) => {
+			const { data, error } = await supabase.from(table).insert(row).select();
+			if (error) throw error;
+
+			return (data ?? []) as T[];
+		},
+		onSuccess: (_, { table }) => {
+			queryClient.invalidateQueries({ queryKey: [table] });
+		},
+		onError: (error: any) => {
+			console.error("Insert failed:", error.message);
+		},
+	});
+}
+
+function useDelete<T>() {
+	return useMutation({
+		mutationFn: async ({ table, column, value }: {
+			table: string;
+			column: string;
+			value: string | number;
+		}) => {
+			const { data, error } = await supabase.from(table).delete().eq(column, value).select();
+			if (error) throw error;
+
+			return (data ?? []) as T[];
+		},
+		onSuccess: (_, { table }) => {
+			queryClient.invalidateQueries({ queryKey: [table] });
+		},
+		onError: (error: any) => {
+			console.error("Delete failed:", error.message);
+		},
+	});
+}
+
+function useUpdate<T>() {
+	return useMutation({
+		mutationFn: async ({ table, column, value, newRow }: {
+			table: string;
+			column: string;
+			value: string | number;
+			newRow: Record<string, any>;
+		}) => {
+			const { data, error } = await supabase.from(table).update(newRow).eq(column, value).select();
+			if (error) throw error;
+
+			return (data ?? []) as T[];
+		},
+		onSuccess: (_, { table }) => {
+			queryClient.invalidateQueries({ queryKey: [table] });
+		},
+		onError: (error: any) => {
+			console.error("Update failed:", error.message);
+		},
+	});
+}

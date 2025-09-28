@@ -16,7 +16,6 @@ type InputProps = {
 	iconColor?: string,
 	iconSize?: number,
 	secureText?: boolean,
-	value?: string
 }
 
 export default function CustomInput({
@@ -30,7 +29,6 @@ export default function CustomInput({
 	iconColor = "black",
 	iconSize = 24,
 	secureText = false,
-	value = ''
 }: InputProps) {
 	return (
 		<View style={[styles.container, boxStyle]}>
@@ -44,7 +42,6 @@ export default function CustomInput({
 				/>
 			)}
 			<TextInput
-				value={value}
 				placeholder={placeholder}
 				style={[styles.text, textStyle]}
 				onChangeText={onChange}
