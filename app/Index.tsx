@@ -10,9 +10,13 @@ export default function Index() {
 
 	const signOutMutation = SupabaseHooks.useSignOut();
 
+	const { data: profile } = SupabaseHooks.useProfile();
+
 	return (
 		<ScreenWrapper bg="white">
 			<View style={styles.container}>
+				<Text>名稱：{profile?.username}</Text>
+				<Text>權限：{profile?.role === 'user' ? '一般使用者' : '管理員'}</Text>
 				<Text
 					onPress={() => signOutMutation.mutate()}
 					style={{ fontSize: 20 }}

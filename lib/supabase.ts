@@ -37,12 +37,14 @@ if (Platform.OS !== "web") {
 
 export const SupabaseHooks = {
 	useSignUp,
+	useSignIn,
 	useSignOut,
 	useFetch,
 	useFetchBuilder,
 	useInsert,
 	useDelete,
 	useUpdate,
+	useProfile,
 };
 
 function useSignUp() {
@@ -65,6 +67,29 @@ function useSignUp() {
 		},
 		onError: (error: any) => {
 			console.error("Sign up failed:", error.message);
+		},
+	});
+}
+
+function useSignIn() {
+	return useMutation({
+		mutationFn: async ({ email, password }: {
+			email: string;
+			password: string;
+		}) => {
+			const { data, error } = await supabase.auth.signInWithPassword({
+				email: email,
+				password: password,
+			});
+			if (error) throw error;
+
+			return data;
+		},
+		onSuccess: () => {
+			console.log("Sign in success.");
+		},
+		onError: (error: any) => {
+			console.error("Sign in failed:", error.message);
 		},
 	});
 }
@@ -212,5 +237,30 @@ function useUpdate<T>() {
 		onError: (error: any) => {
 			console.error("Update failed:", error.message);
 		},
+	});
+}
+
+export type Profile = {
+	user_id: string;
+	username: string;
+	role: string;
+	phone?: string;
+	created_at: string;
+};
+function useProfile() {
+	return useQuery<Profile | null, Error>({
+		queryKey: ['useProfile'],
+		queryFn: async () => {
+			const { data: userData, error: userError } = await supabase.auth.getUser();
+			if (userError) throw userError;
+
+			const user = userData.user;
+			if (!user) return null;
+
+			const { data: profile, error: profileError } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+			if (profileError) throw profileError;
+
+			return profile;
+		}
 	});
 }

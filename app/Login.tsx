@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import CustomInput from '@/components/CustomInput';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { supabase } from '@/lib/supabase';
+import { supabase, SupabaseHooks } from '@/lib/supabase';
 import { hp, wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -10,9 +10,10 @@ import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, Vie
 export default function Login() {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
-	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>("");
 	const router = useRouter();
+
+	const signInMutation = SupabaseHooks.useSignIn();
 
 	async function SignIn() {
 		if (!email || !password) {
@@ -20,20 +21,11 @@ export default function Login() {
 			return;
 		}
 
-		setLoading(true)
-		const { error } = await supabase.auth.signInWithPassword({
+		signInMutation.mutate({
 			email: email.trim(),
 			password: password.trim(),
 		})
-		if (error) {
-			console.log(error.message)
-			setError("登入失敗，請確認信箱與密碼是否正確")
-		}
-		else {
-			console.log("User login success.")
-			setError(null);
-		}
-		setLoading(false)
+		setError(signInMutation.isError ? "登入失敗，請確認信箱與密碼是否正確" : null);
 	}
 
 	return (
@@ -78,7 +70,7 @@ export default function Login() {
 					<Button
 						title="登入"
 						buttonStyle={styles.button}
-						loading={loading}
+						loading={signInMutation.isPending}
 						onPress={SignIn}
 					/>
 
