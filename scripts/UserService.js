@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase.ts";
+import { supabase } from "@/lib/supabase/client";
 
 //Get user data from database
 export async function GetUserData(userID) {

@@ -1,5 +1,3 @@
-import { supabase } from "@/lib/supabase";
-import Feather from "@expo/vector-icons/Feather";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { User } from "@supabase/supabase-js";
 import { useEffect } from "react";
@@ -9,8 +7,9 @@ import Index from "./index";
 import Login from "./login";
 import SignUp from "./signUp";
 
-import JoinGroup from "@/components/JoinGroup";
-import { queryClient } from "@/lib/client";
+import IndexHeader from "@/components/IndexHeader";
+import { queryClient } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase/client";
 import { QueryClientProvider } from '@tanstack/react-query';
 
 const Stack = createNativeStackNavigator();
@@ -62,33 +61,13 @@ function RootLayout() {
 						headerShown: true,
 						headerTitleAlign: "center",
 						headerTitle: "你的小組",
-						headerRight: () => (
-							<>
-								<JoinGroup />
-
-								<Feather
-									name="settings"
-									size={24}
-									style={{ marginRight: 16 }}
-									onPress={() => {
-										// Navigate to settings screen
-
-									}}
-								/>
-							</>
-						)
+						headerRight: () => <IndexHeader />
 					}}
 				/>
 				: (
 					<>
-						<Stack.Screen
-							name="login"
-							component={Login}
-						/>
-						<Stack.Screen
-							name="signUp"
-							component={SignUp}
-						/>
+						<Stack.Screen name="login" component={Login} />
+						<Stack.Screen name="signUp" component={SignUp} />
 					</>
 				)
 			}

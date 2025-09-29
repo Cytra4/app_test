@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import CustomInput from '@/components/CustomInput';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { SupabaseHooks } from '@/lib/supabase';
+import { useSignIn } from '@/lib/supabase/auth';
 import { hp, wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,7 +13,7 @@ export default function Login() {
 	const [error, setError] = useState<string | null>("");
 	const router = useRouter();
 
-	const signInMutation = SupabaseHooks.useSignIn();
+	const signInMutation = useSignIn();
 
 	async function SignIn() {
 		if (!email || !password) {

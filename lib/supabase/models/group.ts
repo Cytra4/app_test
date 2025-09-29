@@ -1,5 +1,6 @@
+import { queryClient } from '@/lib/queryClient';
+import { supabase } from '@/lib/supabase/client';
 import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
 
 export function useJoinGroup() {
 	return useMutation({
@@ -31,11 +32,8 @@ export function useJoinGroup() {
 
 			return group;
 		},
-		onError: (error: any) => {
-			console.error("加入小組失敗:", error.message);
-		},
-		onSuccess: (data) => {
-			console.log("加入小組成功:", data);
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["fetch", 'groups'] });
 		},
 	});
 }

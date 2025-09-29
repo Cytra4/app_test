@@ -1,12 +1,12 @@
-import { useJoinGroup } from '@/lib/api/joinGroup';
+import { useJoinGroup } from '@/lib/supabase/models/group';
 import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 
-export default function JoinGroup() {
+export default function JoinGroup({ code }: { code?: string }) {
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
-	const [groupCode, setGroupCode] = useState<string>("");
+	const [groupCode, setGroupCode] = useState<string>(code ?? "");
 
 	const joinGroupMutation = useJoinGroup();
 
@@ -21,10 +21,14 @@ export default function JoinGroup() {
 		}
 	};
 
+	function modalOpen() {
+		setGroupCode(code ?? "")
+		setError("");
+		setModalVisible(true);
+	}
+
 	function modalClose() {
 		setModalVisible(false);
-		setGroupCode("");
-		setError("");
 	}
 
 	return (
@@ -33,7 +37,7 @@ export default function JoinGroup() {
 				name="plus-square"
 				size={28}
 				style={{ marginRight: 16 }}
-				onPress={() => setModalVisible(true)}
+				onPress={modalOpen}
 			/>
 
 			<Modal

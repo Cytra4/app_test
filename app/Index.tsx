@@ -1,19 +1,22 @@
 import { Button } from '@/components/Button';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { SupabaseHooks } from '@/lib/supabase';
+import { useSignOut } from '@/lib/supabase/auth';
+import { useProfile } from '@/lib/supabase/models/profile';
+import { useFetch, useInsert } from '@/lib/supabase/query';
 import { useAuth } from '@/scripts/AuthContext';
 import { wp } from '@/scripts/constants';
+import { Group } from '@/types/supabase';
 import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
 	const { user, setAuth } = useAuth();
 
-	const signOutMutation = SupabaseHooks.useSignOut();
-	const { data: profile } = SupabaseHooks.useProfile();
+	const signOutMutation = useSignOut();
+	const { data: profile } = useProfile();
 
-	const insertMutation = SupabaseHooks.useInsert();
-	const { data: groups, isLoading, isSuccess } = SupabaseHooks.useFetch<any>('groups', {
+	const insertMutation = useInsert();
+	const { data: groups } = useFetch<Group>('groups', {
 		order: [{ column: 'created_at', ascending: false }]
 	});
 
@@ -42,24 +45,17 @@ export default function Index() {
 				></Button>
 				<FlatList
 					data={groups}
-					keyExtractor={(item) => item.id}
+					keyExtractor={(group) => group.id}
 					renderItem={({ item }) => (
 						<View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}>
-							<Pressable
-								onPress={() => insertMutation.mutate({
-									table: 'group_members', row: {
-										group_id: item.id,
-										user_id: profile?.user_id,
-									}
-								})}
-							>
+							<Pressable>
 								<Text>{item.name}</Text>
 							</Pressable>
 						</View>
 					)}
 				></FlatList>
-			</View>
-		</ScreenWrapper>
+			</View >
+		</ScreenWrapper >
 	)
 }
 

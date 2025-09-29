@@ -1,9 +1,5 @@
 import { useState } from "react";
 
-import { QueryClient } from '@tanstack/react-query';
-export const queryClient = new QueryClient();
-
-
 export function useForm<T>(initial: T) {
 	const [values, setValues] = useState(initial);
 

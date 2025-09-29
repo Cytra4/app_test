@@ -1,8 +1,8 @@
 import { Button } from '@/components/Button';
 import CustomInput from '@/components/CustomInput';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { useForm } from '@/lib/client';
-import { SupabaseHooks } from '@/lib/supabase';
+import { useForm } from '@/lib/hooks/useForm';
+import { useSignUp } from '@/lib/supabase/auth';
 import { hp, wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,7 +13,7 @@ export default function SignUp() {
 	const router = useRouter();
 
 	const signUpForm = useForm({ username: '', email: '', password: '' });
-	const signUpMutation = SupabaseHooks.useSignUp();
+	const signUpMutation = useSignUp();
 
 	function SignUp() {
 		const { username, email, password } = signUpForm.values;
