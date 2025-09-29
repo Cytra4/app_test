@@ -5,9 +5,9 @@ import { User } from "@supabase/supabase-js";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "../scripts/AuthContext";
 import { GetUserData } from "../scripts/UserService.js";
-import Index from "./Index";
-import Login from "./Login";
-import SignUp from "./SignUp";
+import Index from "./index";
+import Login from "./login";
+import SignUp from "./signUp";
 
 import JoinGroup from "@/components/JoinGroup";
 import { queryClient } from "@/lib/client";
@@ -51,8 +51,6 @@ function RootLayout() {
 		}
 	}
 
-	
-
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			{/* Take user to index page when login success */}
@@ -66,8 +64,8 @@ function RootLayout() {
 						headerTitle: "你的小組",
 						headerRight: () => (
 							<>
-								<JoinGroup/>
-								
+								<JoinGroup />
+
 								<Feather
 									name="settings"
 									size={24}

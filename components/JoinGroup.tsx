@@ -1,3 +1,4 @@
+import { useJoinGroup } from '@/lib/api/joinGroup';
 import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
@@ -7,22 +8,20 @@ export default function JoinGroup() {
 	const [error, setError] = useState<string>("");
 	const [groupCode, setGroupCode] = useState<string>("");
 
-	function handleJoin() {
-		if (groupCode == ""){
-			setError("小組代碼不得為空");
-			return;
+	const joinGroupMutation = useJoinGroup();
+
+	const handleJoin = () => {
+		if (!groupCode) {
+			setError('小組代碼不得為空');
+		} else {
+			joinGroupMutation.mutate({ groupCode: groupCode.trim() }, {
+				onError: (error: any) => setError(error.message),
+				onSuccess: () => modalClose()
+			});
 		}
-		else if (groupCode.length != groupCode.trim().length){
-			setError("請輸入不含空格的代碼");
-			return;
-		}
+	};
 
-		//*TO BE DONE
-
-		modalClose();
-	}
-
-	function modalClose(){
+	function modalClose() {
 		setModalVisible(false);
 		setGroupCode("");
 		setError("");
@@ -44,15 +43,13 @@ export default function JoinGroup() {
 				onRequestClose={modalClose}
 				statusBarTranslucent={true}
 			>
-				<TouchableWithoutFeedback
-					onPress={modalClose}
-				>
+				<TouchableWithoutFeedback>
 					<View style={styles.centeredView}>
 						<View style={styles.modalView}>
 							<Text style={styles.modalTitle}>加入小組</Text>
 
 							<TextInput
-								style={[styles.input,error ? styles.errorInput : {}]}
+								style={[styles.input, error ? styles.errorInput : {}]}
 								placeholder="輸入小組代碼"
 								value={groupCode}
 								onChangeText={setGroupCode}
@@ -65,7 +62,10 @@ export default function JoinGroup() {
 									<Text style={styles.buttonText}>取消</Text>
 								</Pressable>
 
-								<Pressable style={[styles.button, styles.join]} onPress={handleJoin}>
+								<Pressable style={[styles.button, styles.join]}
+									onPress={handleJoin}
+									disabled={joinGroupMutation.isPending}
+								>
 									<Text style={styles.buttonText}>加入</Text>
 								</Pressable>
 							</View>
@@ -74,7 +74,7 @@ export default function JoinGroup() {
 					</View>
 				</TouchableWithoutFeedback>
 			</Modal>
-		</View>
+		</View >
 	);
 }
 
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
 		color: "white",
 		fontWeight: "bold",
 	},
-	error:{
+	error: {
 		color: "#E43636",
 		marginBottom: 15,
 		fontWeight: "bold"
 	},
-	errorInput:{
+	errorInput: {
 		borderColor: "#E43636"
 	}
 });

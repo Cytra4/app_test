@@ -3,7 +3,6 @@ import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { SupabaseHooks } from '@/lib/supabase';
 import { useAuth } from '@/scripts/AuthContext';
 import { wp } from '@/scripts/constants';
-import { shouldThrowError } from '@tanstack/react-query';
 import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -17,8 +16,6 @@ export default function Index() {
 	const { data: groups, isLoading, isSuccess } = SupabaseHooks.useFetch<any>('groups', {
 		order: [{ column: 'created_at', ascending: false }]
 	});
-	if (isSuccess)
-		console.log(groups);
 
 	return (
 		<ScreenWrapper bg="white">
