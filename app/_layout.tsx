@@ -5,10 +5,11 @@ import { User } from "@supabase/supabase-js";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "../scripts/AuthContext";
 import { GetUserData } from "../scripts/UserService.js";
-import Index from "./index";
-import Login from "./login";
-import SignUp from "./signUp";
+import Index from "./Index";
+import Login from "./Login";
+import SignUp from "./SignUp";
 
+import JoinGroup from "@/components/JoinGroup";
 import { queryClient } from "@/lib/client";
 import { QueryClientProvider } from '@tanstack/react-query';
 
@@ -65,15 +66,8 @@ function RootLayout() {
 						headerTitle: "你的小組",
 						headerRight: () => (
 							<>
-								<Feather
-									name="plus"
-									size={24}
-									style={{ marginRight: 16 }}
-									onPress={() => {
-										// Join group
-
-									}}
-								/>
+								<JoinGroup/>
+								
 								<Feather
 									name="settings"
 									size={24}
