@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import eventBus from '@/lib/eventBus';
 import { useSignOut } from '@/lib/supabase/auth';
 import { useProfile } from '@/lib/supabase/models/profile';
 import { useFetch, useInsert } from '@/lib/supabase/query';
@@ -42,18 +43,19 @@ export default function Index() {
 						});
 					}}
 					loading={insertMutation.isPending}
-				></Button>
+				/>
 				<FlatList
 					data={groups}
 					keyExtractor={(group) => group.id}
 					renderItem={({ item }) => (
 						<View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}>
-							<Pressable>
-								<Text>{item.name}</Text>
-							</Pressable>
+<Pressable onPress={() => eventBus.emit('openJoinGroup', item.join_code)}>
+	<Text>群組名稱：{item.name} </Text>
+	<Text>成員人數：{item.member_count}</Text>
+</Pressable>
 						</View>
 					)}
-				></FlatList>
+				/>
 			</View >
 		</ScreenWrapper >
 	)

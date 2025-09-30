@@ -1,51 +1,62 @@
+import eventBus from '@/lib/eventBus';
 import { useJoinGroup } from '@/lib/supabase/models/group';
 import Feather from '@expo/vector-icons/Feather';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 
-export default function JoinGroup({ code }: { code?: string }) {
-	const [modalVisible, setModalVisible] = useState<boolean>(false);
+export default function JoinGroup() {
 	const [error, setError] = useState<string>("");
-	const [groupCode, setGroupCode] = useState<string>(code ?? "");
+	const [code, setCode] = useState<string | undefined>("");
+	const [visible, setVisible] = useState(false);
 
 	const joinGroupMutation = useJoinGroup();
 
 	const handleJoin = () => {
-		if (!groupCode) {
+		if (!code) {
 			setError('小組代碼不得為空');
 		} else {
-			joinGroupMutation.mutate({ groupCode: groupCode.trim() }, {
-				onError: (error: any) => setError(error.message),
-				onSuccess: () => modalClose()
-			});
+			joinGroupMutation.mutate(
+				{ groupCode: code.trim() },
+				{
+					onError: (error: any) => setError(error.message),
+					onSuccess: () => setVisible(false),
+				}
+			);
 		}
 	};
 
-	function modalOpen() {
-		setGroupCode(code ?? "")
-		setError("");
-		setModalVisible(true);
-	}
+	useEffect(() => {
+		const handler = (groupCode?: string) => {
+			openModal(groupCode);
+		};
+		eventBus.on('openJoinGroup', handler);
 
-	function modalClose() {
-		setModalVisible(false);
+		return () => {
+			eventBus.off('openJoinGroup', handler);
+		};
+	}, []);
+
+	function openModal(code?: string) {
+		setCode(code ?? '');
+		setError('');
+		setVisible(true);
 	}
 
 	return (
-		<View>
+		<>
 			<Feather
 				name="plus-square"
 				size={28}
 				style={{ marginRight: 16 }}
-				onPress={modalOpen}
+				onPress={() => openModal()}
 			/>
 
 			<Modal
-				transparent={true}
+				transparent
 				animationType="fade"
-				visible={modalVisible}
-				onRequestClose={modalClose}
-				statusBarTranslucent={true}
+				visible={visible}
+				onRequestClose={() => setVisible(false)}
+				statusBarTranslucent
 			>
 				<TouchableWithoutFeedback>
 					<View style={styles.centeredView}>
@@ -55,30 +66,30 @@ export default function JoinGroup({ code }: { code?: string }) {
 							<TextInput
 								style={[styles.input, error ? styles.errorInput : {}]}
 								placeholder="輸入小組代碼"
-								value={groupCode}
-								onChangeText={setGroupCode}
+								value={code}
+								onChangeText={setCode}
 							/>
 
 							{error ? <Text style={styles.error}>{error}</Text> : null}
 
 							<View style={styles.buttonRow}>
-								<Pressable style={[styles.button, styles.cancel]} onPress={modalClose}>
+								<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
 									<Text style={styles.buttonText}>取消</Text>
 								</Pressable>
 
-								<Pressable style={[styles.button, styles.join]}
+								<Pressable
+									style={[styles.button, styles.join]}
 									onPress={handleJoin}
 									disabled={joinGroupMutation.isPending}
 								>
 									<Text style={styles.buttonText}>加入</Text>
 								</Pressable>
 							</View>
-
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
 			</Modal>
-		</View >
+		</>
 	);
 }
 
