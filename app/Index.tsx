@@ -49,10 +49,10 @@ export default function Index() {
 					keyExtractor={(group) => group.id}
 					renderItem={({ item }) => (
 						<View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}>
-<Pressable onPress={() => eventBus.emit('openJoinGroup', item.join_code)}>
-	<Text>群組名稱：{item.name} </Text>
-	<Text>成員人數：{item.member_count}</Text>
-</Pressable>
+							<Pressable onPress={() => eventBus.emit('openJoinGroup', item.join_code)}>
+								<Text>群組名稱：{item.name} </Text>
+								<Text>成員人數：{item.member_count}</Text>
+							</Pressable>
 						</View>
 					)}
 				/>
